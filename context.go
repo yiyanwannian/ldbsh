@@ -109,7 +109,7 @@ func (c *Context) get(key []byte) error {
 	if err != nil {
 		return err
 	}
-	if bytes.Equal(key, []byte("lastBlockNumKey")) {
+	if bytes.Equal(key, []byte("lastBlockNumKey")) || bytes.Equal(key, []byte("stateDBSavePointKey")) {
 		fmt.Println(fmt.Sprintf("raw value: %d", value))
 		num, _ := proto.DecodeVarint(value)
 		fmt.Println(fmt.Sprintf("proto decode value: %d", num))
