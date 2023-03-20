@@ -3,13 +3,16 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/binary"
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/chzyer/readline"
+	"github.com/gogo/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/util"
-	"io"
-	"os"
 )
 
 var (
@@ -105,6 +108,14 @@ func (c *Context) get(key []byte) error {
 	value, err := c.db.Get(key, nil)
 	if err != nil {
 		return err
+	}
+	if bytes.Equal(key, []byte("lastBlockNumKey")) {
+		fmt.Println(fmt.Sprintf("raw value: %d", value))
+		num, _ := proto.DecodeVarint(value)
+		fmt.Println(fmt.Sprintf("proto decode value: %d", num))
+		if num == 0 {
+			fmt.Println(fmt.Sprintf("binary decode value: %d", binary.BigEndian.Uint64(value)))
+		}
 	}
 	c.doPrint(0, key, value, *ShowKey)
 	return nil
